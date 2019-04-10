@@ -1,3 +1,9 @@
 .change-balance{
   display: none;
+  
+}
+.result{
+  display: none;
+  background-color: yellowgreen;
+  margin-top: 20px;
 }
