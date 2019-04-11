@@ -1,19 +1,71 @@
 //bankaccount constructors
-var currentBalance=0;
+// var currentBalance=0;
 
-function BankAccount(name,initialDeposit){
+function BankAccount(name,balance){
   this.name=name;
-  this.initialDeposit=initialDeposit;
-  this.balanceAdjust=[];
+  this.balance=balance;
 }
 
-BankAccount.prototype.deposit=function(){
-  currentBalance += inputtedDeposit;
-  return currentBalance;
+BankAccount.prototype._isPositive=function(amount){
+  const isPositive=amount>0;
+
+  if (!isPositive) {
+    alert('Amount must be positive!');
+    return false;
+  }else{
+    return true;
+  }
 }
-BankAccount.prototype.withdraw=function(){
-  currentBalance += inputtedWithdraw;
-  return currentBalance;
+
+BankAccount.prototype._isNan=function(amount){
+  const isNan=amount===NaN;
+
+  if(isNan){
+    amount = 0;
+    return true;
+  }else{
+    return false;
+  }
+}
+
+BankAccount.prototype._isAllowed = function (amount) {
+  if (!this._isPositive(amount)) return false;
+
+  const isAllowed = this.balance - amount >= 0;
+  if (!isAllowed) {
+    console.error('You have insufficent funds!');
+    return false;
+  }else{
+    return true;
+  }
+}
+
+
+BankAccount.prototype.deposit=function(amount){
+  this._isNan();
+  if(this._isPositive(amount)){
+    this.balance+=amount;
+    console.info('Deposit: ${this.name} new balance is ${this.balance}');
+    return true;
+  }else{
+    return false;
+  }
+  // currentBalance += inputtedDeposit;
+  // return currentBalance;
+}
+
+
+BankAccount.prototype.withdraw = function (amount) {
+  this._isNan();
+  if (this._isAllowed(amount)) {
+    this.balance -= amount;
+    console.info('Withdraw: ${this.name} new balance is ${this.balance}');
+    return true;
+  } else {
+    return false;
+  }
+  // currentBalance += inputtedWithdraw;
+  // return currentBalance;
 }
 function resetFields() {
   $("input#name").val("");
@@ -30,33 +82,40 @@ function errorChecker(){
 
 //user interface
 $(document).ready(function() {
+  var newAccount;
   $("form#forms").submit(function(event) {
     event.preventDefault();
 
     var inputtedName = $("input#name").val();
-    var inputtedInitialDeposit = $("input#initial_deposit").val();
-    var newAccount = new BankAccount(inputtedName, inputtedInitialDeposit);
+    var inputtedInitialDeposit = parseInt($("input#initial_deposit").val());
+    newAccount = new BankAccount(inputtedName, inputtedInitialDeposit);
 
-    currentBalance=newAccount.initialDeposit;
-    newAccount.balanceAdjust.push(currentBalance);
 
     $("#address").append(newAccount.name+", your current balance is:")
-    $("#balance").append(newAccount.balanceAdjust);
+    $("#balance").append(newAccount.balance);
     $(".result").show();
     $(".change-balance").show();
+    console.log(newAccount.balance + ": #forms")
   });
+
   $("form#modifier").submit(function(event){
     event.preventDefault();
 
     var inputtedWithdraw = parseInt($("#withdrawal-amount").val());
     var inputtedDeposit = parseInt($("#deposit-amount").val());
 
-    newAccount.errorChecker()
-    newAccount.deposit();
-    newAccount.withdraw();
+    console.log(newAccount.balance + ": #modifier")
+    newAccount.withdraw(inputtedWithdraw);
+    newAccount.deposit(inputtedDeposit);
 
-    newAccount.balanceAdjust.push(currentBalance);
-    $("#balance").append(newAccount.balanceAdjust);
+    $("#balance").html("");
+    $('#balance').append(newAccount.balance);
+    // newAccount.errorChecker()
+    // newAccount.deposit();
+    // newAccount.withdraw();
+
+    // newAccount.balanceAdjust.push(currentBalance);
+    // $("#balance").append(newAccount.balanceAdjust);
 
   });
 });
