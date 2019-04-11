@@ -8,12 +8,10 @@ function BankAccount(name,initialDeposit){
 }
 
 BankAccount.prototype.deposit=function(){
-  var inputtedDeposit = parseInt($("#deposit-amount").val());
   currentBalance += inputtedDeposit;
   return currentBalance;
 }
 BankAccount.prototype.withdraw=function(){
-  var inputtedWithdraw = parseInt($("#withdrawal-amount").val());
   currentBalance += inputtedWithdraw;
   return currentBalance;
 }
@@ -23,15 +21,12 @@ function resetFields() {
   $("input#deposit-amount").val("");
   $("input#withdrawal-amount").val("");
 }
-// function errorChecker(){
-//   var inputtedDeposit = parseInt($("#deposit-amount").val());
-//   var inputtedWithdraw = parseInt($("#withdrawal-amount").val());
-
-//   if (inputtedDeposit < 0 || inputtedDeposit === null || inputtedWithdraw < 0 || inputtedWithdraw === null ){
-//     inputtedDeposit=0;
-//     inputtedWithdraw=0;
-//   }
-// }
+function errorChecker(){
+  if (inputtedDeposit < 0 || inputtedDeposit === NaN || inputtedWithdraw < 0 || inputtedWithdraw === NaN ){
+    inputtedDeposit=0;
+    inputtedWithdraw=0;
+  }
+}
 
 //user interface
 $(document).ready(function() {
@@ -42,13 +37,26 @@ $(document).ready(function() {
     var inputtedInitialDeposit = $("input#initial_deposit").val();
     var newAccount = new BankAccount(inputtedName, inputtedInitialDeposit);
 
+    currentBalance=newAccount.initialDeposit;
+    newAccount.balanceAdjust.push(currentBalance);
+
     $("#address").append(newAccount.name+", your current balance is:")
-    $("#balance").append(newAccount.initialDeposit);
+    $("#balance").append(newAccount.balanceAdjust);
     $(".result").show();
     $(".change-balance").show();
-    // $("#add-account").click(function() {
-    //   $("#balance").append(newAccount.name+ " "+newAccount.initialDeposit);
-    // });
+  });
+  $("form#modifier").submit(function(event){
+    event.preventDefault();
+
+    var inputtedWithdraw = parseInt($("#withdrawal-amount").val());
+    var inputtedDeposit = parseInt($("#deposit-amount").val());
+
+    newAccount.errorChecker()
+    newAccount.deposit();
+    newAccount.withdraw();
+
+    newAccount.balanceAdjust.push(currentBalance);
+    $("#balance").append(newAccount.balanceAdjust);
 
   });
 });
